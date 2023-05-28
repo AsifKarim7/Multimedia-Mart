@@ -103,15 +103,15 @@ const Payment = () => {
     };
 
     await axios
-    .post(`${server}/order/create-order`, order, config)
-    .then((res) => {
-      setOpen(false);
-      navigate("/order/success");
-      toast.success("Order successful!");
-      localStorage.setItem("cartItems", JSON.stringify([]));
-      localStorage.setItem("latestOrder", JSON.stringify([]));
-      window.location.reload();
-    });
+      .post(`${server}/order/create-order`, order, config)
+      .then((res) => {
+        setOpen(false);
+        navigate("/order/success");
+        toast.success("Order successful!");
+        localStorage.setItem("cartItems", JSON.stringify([]));
+        localStorage.setItem("latestOrder", JSON.stringify([]));
+        window.location.reload();
+      });
   };
 
   return (
@@ -258,7 +258,7 @@ const PaymentInfo = ({
       </div>
 
       <br />
-      
+
       {/* cash on delivery */}
       <div>
         <div className="flex w-full pb-5 border-b mb-2">
@@ -308,13 +308,15 @@ const CartData = ({ orderData }) => {
       <br />
       <div className="flex justify-between border-b pb-3">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
-        <h5 className="text-[18px] font-[600]">{orderData?.discountPrice? "৳" + orderData.discountPrice : "-"}</h5>
+        <h5 className="text-[18px] font-[600]">
+          {orderData?.discountPrice ? "৳" + orderData.discountPrice : "-"}
+        </h5>
       </div>
       <div className="flex justify-between pb-3">
-      <h3 className="text-[16px] font-[400] text-[#000000a4] pt-3">Total:</h3>
-      <h5 className="text-[18px] font-[600] text-end pt-3">
-        {orderData?.totalPrice}৳
-      </h5>
+        <h3 className="text-[16px] font-[400] text-[#000000a4] pt-3">Total:</h3>
+        <h5 className="text-[18px] font-[600] text-end pt-3">
+          {orderData?.totalPrice}৳
+        </h5>
       </div>
       <br />
     </div>
