@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const User = require("../model/user");
+const cloudinary = require("cloudinary");
 const router = express.Router();
 const { upload } = require("../multer");
 const ErrorHandler = require("../utils/ErrorHandler");
@@ -14,28 +15,48 @@ const { isAuthenticated, isAdmin } = require("../middleware/auth");
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
+
     const userEmail = await User.findOne({ email });
 
+    // if (userEmail) {
+    //   const filename = req.file.filename;
+    //   const filePath = `uploads/${filename}`;
+    //   fs.unlink(filePath, (err) => {
+    //     if (err) {
+    //       console.log(err);
+    //       res.status(500).json({ message: "Error deleting file" });
+    //     }
+        
+    //   });
+    //   return next(new ErrorHandler("User already exists", 400));
+    // }
+
+    // const filename = req.file.filename;
+    // const fileUrl = path.join(filename);
+
+    // const user = {
+    //   name: name,
+    //   email: email,
+    //   password: password,
+    //   avatar: fileUrl,
+    // };
+
     if (userEmail) {
-      const filename = req.file.filename;
-      const filePath = `uploads/${filename}`;
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.log(err);
-          res.status(500).json({ message: "Error deleting file" });
-        }
-      });
       return next(new ErrorHandler("User already exists", 400));
     }
 
-    const filename = req.file.filename;
-    const fileUrl = path.join(filename);
+    const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+      folder: "avatars",
+    });
 
     const user = {
       name: name,
       email: email,
       password: password,
-      avatar: fileUrl,
+      avatar: {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+      },
     };
 
     const activationToken = createActivationToken(user);
@@ -165,6 +186,8 @@ router.get(
       res.cookie("token", null, {
         expires: new Date(Date.now()),
         httpOnly: true,
+        sameSite: "none",
+        secure: true,
       });
       res.status(201).json({
         success: true,
@@ -218,24 +241,30 @@ router.put(
 router.put(
   "/update-avatar",
   isAuthenticated,
-  upload.single("image"),
   catchAsyncErrors(async (req, res, next) => {
     try {
-      const existsUser = await User.findById(req.user.id);
+      let existsUser = await User.findById(req.user.id);
+      if (req.body.avatar !== "") {
+        const imageId = existsUser.avatar.public_id;
 
-      const existAvatarPath = `uploads/${existsUser.avatar}`;
+        await cloudinary.v2.uploader.destroy(imageId);
 
-      fs.unlinkSync(existAvatarPath);
+        const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+          folder: "avatars",
+          width: 150,
+        });
 
-      const fileUrl = path.join(req.file.filename);
+        existsUser.avatar = {
+          public_id: myCloud.public_id,
+          url: myCloud.secure_url,
+        };
+      }
 
-      const user = await User.findByIdAndUpdate(req.user.id, {
-        avatar: fileUrl,
-      });
+      await existsUser.save();
 
       res.status(200).json({
         success: true,
-        user,
+        user: existsUser,
       });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
@@ -329,6 +358,10 @@ router.delete(
           new ErrorHandler("User is not available with this id", 400)
         );
       }
+
+      const imageId = user.avatar.public_id;
+
+      await cloudinary.v2.uploader.destroy(imageId);
 
       await User.findByIdAndDelete(req.params.id);
 

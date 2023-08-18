@@ -17,10 +17,10 @@ const Wishlist = ({ setOpenWishlist }) => {
   };
 
   const addToCartHandler = (data) => {
-    const newData = {...data, qty:1};
+    const newData = { ...data, qty: 1 };
     dispatch(addTocart(newData));
     setOpenWishlist(false);
-  }
+  };
 
   return (
     <div className="fixed top-0 left-0 w-full bg-[#0000004b] h-screen z-10">
@@ -59,7 +59,12 @@ const Wishlist = ({ setOpenWishlist }) => {
               <div className="w-full border-t">
                 {wishlist &&
                   wishlist.map((i, index) => (
-                    <CartSingle key={index} data={i} removeFromWishlistHandler={removeFromWishlistHandler} addToCartHandler={addToCartHandler} />
+                    <CartSingle
+                      key={index}
+                      data={i}
+                      removeFromWishlistHandler={removeFromWishlistHandler}
+                      addToCartHandler={addToCartHandler}
+                    />
                   ))}
               </div>
             </div>
@@ -70,18 +75,19 @@ const Wishlist = ({ setOpenWishlist }) => {
   );
 };
 
-const CartSingle = ({ data,removeFromWishlistHandler,addToCartHandler }) => {
+const CartSingle = ({ data, removeFromWishlistHandler, addToCartHandler }) => {
   const [value, setValue] = useState(1);
   const totalPrice = data.originalPrice * value;
 
   return (
     <div className="border-b p-4">
       <div className="w-full 800px:flex items-center">
-        <RxCross1 className="cursor-pointer 800px:mb-['unset'] 800px:ml-['unset'] mb-2 ml-2"
-        onClick={() => removeFromWishlistHandler(data)}
+        <RxCross1
+          className="cursor-pointer 800px:mb-['unset'] 800px:ml-['unset'] mb-2 ml-2"
+          onClick={() => removeFromWishlistHandler(data)}
         />
         <img
-          src={`${backend_url}${data?.images[0]}`}
+          src={`${data?.images[0]?.url}`}
           alt=""
           className="w-[130px] h-min ml-2 mr-2 rounded-[5px]"
         />
@@ -93,8 +99,11 @@ const CartSingle = ({ data,removeFromWishlistHandler,addToCartHandler }) => {
           </h4>
         </div>
         <div>
-          <BsCartPlus size={20} className="cursor-pointer" tile="Add to cart"
-           onClick={() => addToCartHandler(data)}
+          <BsCartPlus
+            size={20}
+            className="cursor-pointer"
+            tile="Add to cart"
+            onClick={() => addToCartHandler(data)}
           />
         </div>
       </div>

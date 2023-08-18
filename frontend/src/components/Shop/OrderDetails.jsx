@@ -43,24 +43,23 @@ const OrderDetails = () => {
 
   const refundOrderUpdateHandler = async (e) => {
     await axios
-    .put(
-      `${server}/order/order-refund-success/${id}`,
-      {
-        status,
-      },
-      { withCredentials: true }
-    )
-    .then((res) => {
-      toast.success("Order updated!");
-      dispatch(getAllOrdersOfShop(seller._id));
-    })
-    .catch((error) => {
-      toast.error(error.response.data.message);
-    });
-  }
+      .put(
+        `${server}/order/order-refund-success/${id}`,
+        {
+          status,
+        },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        toast.success("Order updated!");
+        dispatch(getAllOrdersOfShop(seller._id));
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+      });
+  };
 
   console.log(data);
-
 
   return (
     <div className={`py-4 min-h-screen ${styles.section}`}>
@@ -94,7 +93,7 @@ const OrderDetails = () => {
         data?.cart.map((item, index) => (
           <div className="w-full flex items-start mb-5">
             <img
-              src={`${backend_url}/${item.images[0]}`}
+              src={`${item.images[0]?.url}`}
               alt=""
               className="w-[80x] h-[80px]"
             />
@@ -117,11 +116,11 @@ const OrderDetails = () => {
       <div className="w-full 800px:flex items-center">
         <div className="w-full 800px:w-[60%]">
           <h4 className="pt-3 text-[20px] font-[600]">Shipping Address:</h4>
-          <h4 className="pt-3 text-[20px]">
-            {data?.shippingAddress.address1}
-          </h4>
+          <h4 className="pt-3 text-[20px]">{data?.shippingAddress.address1}</h4>
           <h4 className=" text-[20px]">{data?.shippingAddress.country}</h4>
-          <h4 className=" text-[20px]">Phone Number: {data?.user?.phoneNumber}</h4>
+          <h4 className=" text-[20px]">
+            Phone Number: {data?.user?.phoneNumber}
+          </h4>
         </div>
         <div className="w-full 800px:w-[40%]">
           <h4 className="pt-3 text-[20px]">Payment Info:</h4>
@@ -134,25 +133,44 @@ const OrderDetails = () => {
       <br />
       <br />
       <h4 className="pt-3 text-[20px] font-[600]">Order Status:</h4>
-      {data?.status !== "Processing refund" && data?.status !== "Refund Success" && (
+      {data?.status !== "Processing refund" &&
+        data?.status !== "Refund Success" && (
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
+          >
+            {[
+              "Processing",
+              "Transferred to delivery partner",
+              "On the way",
+              "Delivered",
+            ]
+              .slice(
+                [
+                  "Processing",
+                  "Transferred to delivery partner",
+                  "On the way",
+                  "Delivered",
+                ].indexOf(data?.status)
+              )
+              .map((option, index) => (
+                <option value={option} key={index}>
+                  {option}
+                </option>
+              ))}
+          </select>
+        )}
+      {data?.status === "Processing refund" ||
+      data?.status === "Refund Success" ? (
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
           className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
         >
-          {[
-            "Processing",
-            "Transferred to delivery partner",       
-            "On the way",
-            "Delivered",
-          ]
+          {["Processing refund", "Refund Success"]
             .slice(
-              [
-                "Processing",
-                "Transferred to delivery partner",
-                "On the way",
-                "Delivered",
-              ].indexOf(data?.status)
+              ["Processing refund", "Refund Success"].indexOf(data?.status)
             )
             .map((option, index) => (
               <option value={option} key={index}>
@@ -160,35 +178,15 @@ const OrderDetails = () => {
               </option>
             ))}
         </select>
-      )}
-      {
-        data?.status === "Processing refund" || data?.status === "Refund Success" ? (
-          <select value={status} 
-       onChange={(e) => setStatus(e.target.value)}
-       className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
-      >
-        {[
-            "Processing refund",
-            "Refund Success",
-          ]
-            .slice(
-              [
-                "Processing refund",
-                "Refund Success",
-              ].indexOf(data?.status)
-            )
-            .map((option, index) => (
-              <option value={option} key={index}>
-                {option}
-              </option>
-            ))}
-      </select>
-        ) : null
-      }
+      ) : null}
 
       <div
         className={`${styles.button} mt-5 !bg-[#1F1EFB] !rounded-[4px] text-white font-[600] !h-[45px] text-[18px]`}
-        onClick={data?.status !== "Processing refund" ? orderUpdateHandler : refundOrderUpdateHandler}
+        onClick={
+          data?.status !== "Processing refund"
+            ? orderUpdateHandler
+            : refundOrderUpdateHandler
+        }
       >
         Update Status
       </div>

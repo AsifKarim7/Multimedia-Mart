@@ -32,10 +32,16 @@ const shopSchema = new mongoose.Schema({
     type: String,
     default: "Seller",
   },
-  avatar: {
-    type: String,
-    required: true,
-  },
+  avatar:{
+    public_id: {
+      type: String,
+      required: true,
+    },
+    url: {
+      type: String,
+      required: true,
+    },
+ },
   availableBalance: {
     type: Number,
     default: 0,

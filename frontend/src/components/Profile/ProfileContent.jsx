@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import {
-  AiOutlineArrowRight,
-  AiOutlineCamera,
-} from "react-icons/ai";
+import { AiOutlineArrowRight, AiOutlineCamera } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { backend_url, server } from "../../server";
 import styles from "../../styles/styles";
@@ -11,10 +8,7 @@ import { Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { MdTrackChanges } from "react-icons/md";
 
-import {
-  loadUser,
-  updateUserInformation,
-} from "../../redux/actions/user";
+import { loadUser, updateUserInformation } from "../../redux/actions/user";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -61,8 +55,8 @@ const ProfileContent = ({ active }) => {
         withCredentials: true,
       })
       .then((response) => {
-         dispatch(loadUser());
-         toast.success("avatar updated successfully!");
+        dispatch(loadUser());
+        toast.success("avatar updated successfully!");
       })
       .catch((error) => {
         toast.error(error);
@@ -77,7 +71,7 @@ const ProfileContent = ({ active }) => {
           <div className="flex justify-center w-full">
             <div className="relative">
               <img
-                src={`${backend_url}${user?.avatar}`}
+                src={`${user?.avatar?.url}`}
                 className="w-[150px] h-[150px] rounded-full object-cover border-[3px] border-[#1F1EFB]"
                 alt=""
               />
@@ -182,7 +176,6 @@ const ProfileContent = ({ active }) => {
           <ChangePassword />
         </div>
       )}
-
     </div>
   );
 };
@@ -281,7 +274,8 @@ const AllRefundOrders = () => {
     dispatch(getAllOrdersOfUser(user._id));
   }, []);
 
-  const eligibleOrders = orders && orders.filter((item) => item.status === "Processing refund");
+  const eligibleOrders =
+    orders && orders.filter((item) => item.status === "Processing refund");
 
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
@@ -337,7 +331,7 @@ const AllRefundOrders = () => {
   const row = [];
 
   eligibleOrders &&
-   eligibleOrders.forEach((item) => {
+    eligibleOrders.forEach((item) => {
       row.push({
         id: item._id,
         itemsQty: item.cart.length,

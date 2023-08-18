@@ -20,7 +20,6 @@ const DashboardHeader = () => {
       </div>
       <div className="flex items-center">
         <div className="flex items-center mr-4">
-
           <Link to="/dashboard-orders" className="800px:block hidden">
             <FiShoppingBag
               color="#1F1EFB"
@@ -29,7 +28,11 @@ const DashboardHeader = () => {
             />
           </Link>
           <Link to="/dashboard-products" className="800px:block hidden">
-            <FiPackage color="#1F1EFB" size={30} className="mx-5 cursor-pointer" />
+            <FiPackage
+              color="#1F1EFB"
+              size={30}
+              className="mx-5 cursor-pointer"
+            />
           </Link>
           <Link to="/dashboard-messages" className="800px:block hidden">
             <BiMessageSquareDetail
@@ -40,7 +43,7 @@ const DashboardHeader = () => {
           </Link>
           <Link to={`/shop/${seller._id}`}>
             <img
-              src={`${backend_url}${seller.avatar}`}
+              src={`${seller.avatar?.url}`}
               alt=""
               className="w-[50px] h-[50px] rounded-full object-cover"
             />
